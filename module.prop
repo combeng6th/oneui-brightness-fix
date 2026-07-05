@@ -1,0 +1,6 @@
+id=brightness_fix
+name=Brightness Fix (N20U on Astro-OS)
+version=v1.0
+versionCode=1
+author=combeng6th
+description=Fixes broken brightness on S23U ROM ported to Note 20 Ultra. Locks out the broken lights HAL and replaces it with a native daemon using ASensorManager for adaptive brightness.
