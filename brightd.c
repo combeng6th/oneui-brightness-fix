@@ -6,7 +6,7 @@
  * brightness controller.
  *
  * Sensor: ASensorManager via dlopen (zero forks), dumpsys fallback.
- * Filter: median-of-10 -> EMA -> user offset -> hysteresis -> ramp.
+ * Filter: median-of-5 -> asymmetric EMA -> user offset -> hysteresis -> ramp.
  *
  * Build: clang -O2 -Wall -o brightd brightd.c -ldl && llvm-strip brightd
  */
@@ -26,16 +26,17 @@
 #define MAX_HW       510
 #define MIN_HW       2
 #define MAX_SW       255
-#define AUTO_K       50      /* curve midpoint: 50% at 50 lux (was 80) */
-#define EMA_ALPHA    0.10f
-#define HYSTERESIS   10
+#define AUTO_K       50      /* curve midpoint: 50% at 50 lux */
+#define EMA_UP       0.30f   /* brightening EMA: 63% in ~0.3s */
+#define EMA_DOWN     0.08f   /* darkening EMA: 63% in ~1.2s */
+#define HYSTERESIS   6
 #define MIN_STEP     1
-#define RAMP_DIV     15
-#define FRAME_MS     200
+#define RAMP_DIV     8       /* ramp speed: full range in ~1.2s */
+#define FRAME_MS     150
 #define MODE_CHECK_S 5
-#define SLIDER_CHECK_FRAMES 5  /* check slider every 5 frames = 1s */
-#define MEDIAN_WIN   10
-#define SENSOR_RATE_US 250000
+#define SLIDER_CHECK_FRAMES 7  /* check slider every 7 frames ~ 1s */
+#define MEDIAN_WIN   5
+#define SENSOR_RATE_US 100000  /* 100ms = 10 samples/sec */
 #define ASENSOR_TYPE_LIGHT 5
 
 typedef struct {
@@ -231,10 +232,13 @@ int main(void) {
                 msleep(FRAME_MS);
             }
 
-            /* Median + EMA */
+            /* Median + asymmetric EMA (fast brighten, slow darken) */
             int med = median_lux();
             if (smooth < 0) smooth = (float)med;
-            else smooth += ((float)med - smooth) * EMA_ALPHA;
+            else {
+                float alpha = ((float)med > smooth) ? EMA_UP : EMA_DOWN;
+                smooth += ((float)med - smooth) * alpha;
+            }
 
             /* Sensor-only backlight (before user offset) */
             int auto_bl = lux_to_bl((int)(smooth + 0.5f));
