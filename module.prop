@@ -1,6 +1,7 @@
 id=brightness_fix
-name=Brightness Fix (N20U on Astro-OS)
+name=Adaptive Brightness Fix
 version=v1.0
 versionCode=1
 author=combeng6th
-description=Fixes broken brightness on S23U ROM ported to Note 20 Ultra. Locks out the broken lights HAL and replaces it with a native daemon using ASensorManager for adaptive brightness.
+description=Fixes broken adaptive brightness on ported Samsung OneUI 8 ROMs (Qualcomm). Locks out the misconfigured lights HAL and replaces it with a native daemon that reads the ambient light sensor directly.
+updateJson=https://raw.githubusercontent.com/combeng6th/brightness-fix/master/update.json
