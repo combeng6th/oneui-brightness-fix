@@ -21,9 +21,10 @@
 #include <stdint.h>
 
 #define BKLT_PATH  "/sys/class/backlight/panel0-backlight/brightness"
+#define BKLT_MAX   "/sys/class/backlight/panel0-backlight/max_brightness"
 #define LIBANDROID "/system/lib64/libandroid.so"
 
-#define MAX_HW       510
+#define DEFAULT_MAX_HW 510
 #define MIN_HW       2
 #define MAX_SW       255
 #define AUTO_K       50      /* curve midpoint: 50% at 50 lux */
@@ -63,6 +64,7 @@ static int     (*fn_looper_poll)(int, int*, int*, void**);
 
 static int sensor_api_ok = 0;
 static ASensorEventQueue *sensor_queue;
+static int max_hw = DEFAULT_MAX_HW;
 
 static int lux_ring[MEDIAN_WIN], lux_n = 0, lux_idx = 0;
 
@@ -87,17 +89,17 @@ static int median_lux(void) {
 /* Map lux to backlight using saturation curve */
 static int lux_to_bl(int lux) {
     if (lux <= 0) return MIN_HW;
-    int bl = lux * MAX_HW / (lux + AUTO_K);
+    int bl = lux * max_hw / (lux + AUTO_K);
     if (bl < MIN_HW) return MIN_HW;
-    if (bl > MAX_HW) return MAX_HW;
+    if (bl > max_hw) return max_hw;
     return bl;
 }
 
-/* Map 0-255 slider to 0-510 backlight (same formula as manual mode) */
+/* Map 0-255 slider to backlight (same formula as manual mode) */
 static int slider_to_bl(int sw) {
-    if (sw >= MAX_SW) return MAX_HW;
+    if (sw >= MAX_SW) return max_hw;
     if (sw <= 0) return MIN_HW;
-    return MIN_HW + sw * (MAX_HW - MIN_HW) / MAX_SW;
+    return MIN_HW + sw * (max_hw - MIN_HW) / MAX_SW;
 }
 
 static int clamp(int v, int lo, int hi) {
@@ -185,6 +187,9 @@ int main(void) {
     }
     msleep(3000);
 
+    int hw_max = read_sysfs_int(BKLT_MAX);
+    if (hw_max > 0) max_hw = hw_max;
+
     sensor_api_ok = init_sensor_api();
 
     float smooth = -1.0f;
@@ -257,7 +262,7 @@ int main(void) {
             }
 
             /* Apply user offset to sensor-driven backlight */
-            int tgt = clamp(auto_bl + user_offset, MIN_HW, MAX_HW);
+            int tgt = clamp(auto_bl + user_offset, MIN_HW, max_hw);
 
             /* Hysteresis */
             if (ramp < 0) ramp = tgt;
