@@ -1,7 +1,7 @@
 id=oneui_brightness_fix
 name=OneUI ROM Brightness Fix
-version=v2.0
-versionCode=2
+version=v3.0
+versionCode=3
 author=combeng6th
-description=Fixes broken brightness and adaptive brightness on custom Samsung OneUI ROMs and kernels where the lights HAL doesn't match the hardware. Replaces the broken HAL with a native daemon that reads the ambient light sensor directly.
+description=Fixes broken brightness and adaptive brightness on custom Samsung OneUI ROMs and kernels where the lights HAL doesn't match the hardware. Stops the broken HAL and replaces it with a native daemon that reads the ambient light sensor directly.
 updateJson=https://raw.githubusercontent.com/combeng6th/oneui-brightness-fix/master/update.json

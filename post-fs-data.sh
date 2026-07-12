@@ -1,4 +1,10 @@
 #!/system/bin/sh
+MODDIR=${0%/*}
+
+# Ensure the daemon binary is executable (safety net for
+# ZIP extraction that may not preserve exec bits reliably).
+chmod 755 "$MODDIR/brightd"
+
 # Lock all real backlight sysfs nodes to root-only write.
 # Scans /sys/class/backlight/ and locks any device with max_brightness > 0.
 # Dummy/virtual devices (max=0) are skipped.

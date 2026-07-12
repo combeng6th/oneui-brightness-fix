@@ -1,6 +1,6 @@
 {
-  "version": "v2.0",
-  "versionCode": 2,
-  "zipUrl": "https://github.com/combeng6th/oneui-brightness-fix/releases/download/v2.0/oneui-brightness-fix-v2.0.zip",
-  "changelog": "https://github.com/combeng6th/oneui-brightness-fix/blob/master/README.md"
+  "version": "v3.0",
+  "versionCode": 3,
+  "zipUrl": "https://github.com/combeng6th/oneui-brightness-fix/releases/download/v3.0/oneui-brightness-fix-v3.0.zip",
+  "changelog": "https://raw.githubusercontent.com/combeng6th/oneui-brightness-fix/master/CHANGELOG.md"
 }
